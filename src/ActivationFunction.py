@@ -6,6 +6,7 @@ class ActivationFunc:
     def __init__(self, activation):
         self.activation = activation.lower()
         if self.activation not in ("relu", "sigmoid"):
+            print('Такого аргумента не существует для функции активации!')
             sys.exit("Error! Wrong activation function")
 
     def forward(self, value):
@@ -23,7 +24,9 @@ class ActivationFunc:
     def backprop(self, value):
         activation = self.activation
         if activation == 'relu':
-            if value < 0 or value > 0:
+            if value < 0:
+                return 0.01
+            elif value > 0:
                 return 0.01
             return 1
         elif activation == "sigmoid":

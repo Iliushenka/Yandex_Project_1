@@ -6,9 +6,17 @@ import sys
 class Matrix:
     def __init__(self, row, column):
         self.matrix = [[0 for __ in range(column)] for _ in range(row)]
-        self.row, self.column = row, column
+        self.row = row
+        self.column = column
 
     def __str__(self):
+        text = ["━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"]
+        for row in range(self.row):
+            text.append(f"{row}: {self.get(row, 0)}")
+        text += ["━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"]
+        return '\n'.join(text)
+
+    def __repr__(self):
         text = ["━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"]
         for row in range(self.row):
             text.append(f"{row}: {self.get(row, 0)}")

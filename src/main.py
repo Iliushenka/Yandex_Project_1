@@ -175,50 +175,58 @@ def result(path):
     return network.layers[-1].matrix, network.layers[-1].max_element()[1]
 
 
-layers_data = f"{28 * 28} 20 10"
-network = Network(layers_data, activation="ReLu", learn_rate=0.085, bias_status='on')
-network.load('weight', 'weight1.csv')
-network.load('bias', 'bias1.csv')
+
+if __name__ == "__main__":
+    layers_data = f"{28 * 28} 20 10"
+    network = Network(layers_data, activation="ReLu", learn_rate=0.01, bias_status='on')
+    network.load('weight', 'weight1.csv')
+    network.load('bias', 'bias1.csv')
 
 
-situation = input('Обучить? 1/0: ')
+    print("Добро пожаловать! ИИ инициализирован")
+    situation = input('Обучить? 1/0: ')
 
-if situation == '1':
-    with gzip.open('../resource/mnist.pkl.gz', 'rb') as f:
-        if sys.version_info < (3,):
-            data_ai = pickle.load(f)
-        else:
-            data_ai = pickle.load(f, encoding='bytes')
-        f.close()
-        (x_train, y_train), (x_test, y_test) = data_ai
+    if situation == '1':
+        with gzip.open('../resource/mnist.pkl.gz', 'rb') as f:
+            if sys.version_info < (3,):
+                data_ai = pickle.load(f)
+            else:
+                data_ai = pickle.load(f, encoding='bytes')
+            f.close()
+            (x_train, y_train), (x_test, y_test) = data_ai
+        print("База данных загружена!")
 
-    epochs = 5
-    start, end = (0, 2000)
-    for epoch in range(1, epochs + 1):
-        time_start = time.time()
-        error_epoch = 0
-        start += 0
-        data = [n for n in range(start, start + end)]
-        shuffle(data)
-        print(f"Epoch: {epoch} / {epochs}")
-        for index in data:
-            network.set_image(x_train[index], y_train[index])
-            network.forward()
-            network.backprop()
-            result_max, result_index = network.layers[-1].max_element()
-            if int(network.answer) != int(result_index):
-                error_epoch += 1
-        network.update_lr(0.5)
-        time_end = time.time()
-        time_calc = time_end - time_start
-        print(f"Errors: {error_epoch} / {end}, Calculated time: {time_calc} sec.")
-    print('End epochs!')
-    network.save('weight', 'weight1.csv')
-    network.save('bias', 'bias1.csv')
-elif situation == '0':
-    qApp = QApplication(sys.argv)
-    app = MainWindow()
-    app.show()
-    sys.exit(qApp.exec())
-else:
-    sys.exit('Wrong argument')
+        epochs = 1
+        start, end = (3000, 5000)
+        for epoch in range(1, epochs + 1):
+            time_start = time.time()
+            error_epoch = 0
+            learn_update = 0.5
+            start += 500
+            data = [n for n in range(start, start + end)]
+            shuffle(data)
+            print(f"Epoch: {epoch} / {epochs}")
+            for index in data:
+                network.set_image(x_train[index], y_train[index])
+                network.forward()
+                network.backprop()
+                result_max, result_index = network.layers[-1].max_element()
+                if int(network.answer) != int(result_index):
+                    error_epoch += 1
+            network.update_lr(learn_update)
+            time_end = time.time()
+            time_calc = time_end - time_start
+            print(f"Errors: {error_epoch} / {end}, Calculated time: {time_calc} sec.")
+        print('End epochs!')
+        print('Обучение заверешно!')
+        network.save('weight', 'weight1.csv')
+        network.save('bias', 'bias1.csv')
+    elif situation == '0':
+        print("Программа запущена")
+        qApp = QApplication(sys.argv)
+        app = MainWindow()
+        app.show()
+        sys.exit(qApp.exec())
+    else:
+        print("Надо написать 1 или 0")
+        sys.exit('Wrong argument')

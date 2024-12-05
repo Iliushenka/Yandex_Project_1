@@ -50,6 +50,7 @@ class Network:
                 output.append(delta_output)
             output = '\n'.join(output)
         open(f'../resource/{filename}', 'w').write(output)
+        print(f'Сохранено {type}')
 
     def load(self, type, filename):
         type = type.lower()
@@ -80,6 +81,7 @@ class Network:
                     for row, value_row in enumerate(rows):
                         self.layers[layer].set(float(value_row), row, 0)
                     layer += 2
+            print(f'Загружено {type}')
         except:
             sys.exit(f'Error in data with filename "{filename}"')
 

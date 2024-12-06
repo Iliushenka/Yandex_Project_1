@@ -26,7 +26,7 @@ class ActivationFunc:
         if activation == 'relu':
             if value < 0:
                 return 0.01
-            elif value > 0:
+            elif value > 1:
                 return 0.01
             return 1
         elif activation == "sigmoid":

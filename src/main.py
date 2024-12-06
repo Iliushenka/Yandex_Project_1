@@ -38,18 +38,6 @@ class Canvas(QWidget):
     def mouseMoveEvent(self, event):
         if event.buttons() & Qt.MouseButton.LeftButton:
             self.path.append(event.pos())
-            results, index_max = result(self.path)
-            self.data[0].setText(f"0: {results[0][0]}")
-            self.data[1].setText(f"1: {results[1][0]}")
-            self.data[2].setText(f"2: {results[2][0]}")
-            self.data[3].setText(f"3: {results[3][0]}")
-            self.data[4].setText(f"4: {results[4][0]}")
-            self.data[5].setText(f"5: {results[5][0]}")
-            self.data[6].setText(f"6: {results[6][0]}")
-            self.data[7].setText(f"7: {results[7][0]}")
-            self.data[8].setText(f"8: {results[8][0]}")
-            self.data[9].setText(f"9: {results[9][0]}")
-            self.data[10].setText(f"Результат: {index_max}")
             self.update()
 
 
@@ -67,6 +55,11 @@ class MainWindow(QMainWindow):
         canvas_result.fill(Qt.GlobalColor.blue)
         self.result.setPixmap(canvas_result)
         self.result.move(280, 60)
+
+        self.button_result = QPushButton('Запуск', self)
+        self.button_result.move(559, 0)
+        self.button_result.resize(100, 100)
+        self.button_result.clicked.connect(self.clicked_result)
 
         self.label0 = QLabel(self)
         self.label0.move(280, 100)
@@ -134,31 +127,45 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AI program")
         self.setGeometry(100, 100, 700, 650)
 
+    def clicked_result(self):
+        results, index_max = result(self.canvas.path)
+        self.label0.setText(f"0: {results[0][0]}")
+        self.label1.setText(f"1: {results[1][0]}")
+        self.label2.setText(f"2: {results[2][0]}")
+        self.label3.setText(f"3: {results[3][0]}")
+        self.label4.setText(f"4: {results[4][0]}")
+        self.label5.setText(f"5: {results[5][0]}")
+        self.label6.setText(f"6: {results[6][0]}")
+        self.label7.setText(f"7: {results[7][0]}")
+        self.label8.setText(f"8: {results[8][0]}")
+        self.label9.setText(f"9: {results[9][0]}")
+        self.result.setText(f"Результат: {index_max}")
+
     def clicked_clear(self):
         self.canvas.path = list()
         self.canvas.update()
 
 
-blur = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0.2, 0.2, 0.1, 0, 0, 0],
-        [0, 0, 0.1, 0.3, 0.4, 0.3, 0.1, 0, 0],
-        [0, 0, 0.2, 0.4, 0.7, 0.4, 0.2, 0, 0],
-        [0, 0, 0.1, 0.3, 0.4, 0.3, 0.1, 0, 0],
-        [0, 0, 0, 0.2, 0.2, 0.2, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+blur = [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.1, 0.2, 0.1, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.1, 0.2, 0.4, 0.1, 0.1, 0.0, 0.0],
+        [0.0, 0.1, 0.1, 0.3, 0.4, 0.3, 0.1, 0.1, 0.0],
+        [0.0, 0.2, 0.4, 0.4, 0.7, 0.4, 0.4, 0.2, 0.0],
+        [0.0, 0.1, 0.1, 0.3, 0.4, 0.3, 0.1, 0.1, 0.0],
+        [0.0, 0.0, 0.1, 0.2, 0.4, 0.2, 0.1, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.1, 0.2, 0.1, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
 
 
 def result(path):
     image = [[0 for __ in range(28)] for _ in range(28)]
-    result_image = image.copy()
+    result_image = [[0 for __ in range(28)] for _ in range(28)]
     for pos in path:
         pos_y = max(min(pos.y() // 10, 27), 0)
         pos_x = max(min(pos.x() // 10, 27), 0)
-        image[pos_y][pos_x] = 255
-    for row in range(28):
-        for column in range(28):
+        image[pos_y][pos_x] = 1
+    for column in range(28):
+        for row in range(28):
             delta = 0
             for m in range(-4, 5):
                 for n in range(-4, 5):
@@ -168,8 +175,10 @@ def result(path):
                     else:
                         value = image[delta_m][delta_n] * blur[m + 4][n + 4]
                     delta += value
-            result_image[row][column] = min(delta, 255)
-    image = result_image.copy()
+            result_image[row][column] = min(delta, 253)
+    for k in result_image:
+        print(k)
+    image = result_image
     network.set_image(image, 0)
     network.forward()
     return network.layers[-1].matrix, network.layers[-1].max_element()[1]
@@ -177,10 +186,10 @@ def result(path):
 
 
 if __name__ == "__main__":
-    layers_data = f"{28 * 28} 20 10"
-    network = Network(layers_data, activation="ReLu", learn_rate=0.01, bias_status='on')
-    network.load('weight', 'weight1.csv')
-    network.load('bias', 'bias1.csv')
+    layers_data = f"{28 * 28} 16 10"
+    network = Network(layers_data, activation="relu", learn_rate=0.035, bias_status='off')
+    network.load('weight', 'weight2.csv')
+    network.load('bias', 'bias2.csv')
 
 
     print("Добро пожаловать! ИИ инициализирован")
@@ -196,13 +205,13 @@ if __name__ == "__main__":
             (x_train, y_train), (x_test, y_test) = data_ai
         print("База данных загружена!")
 
-        epochs = 1
-        start, end = (3000, 5000)
+        epochs = 20
+        start, end = (3000, 1000)
         for epoch in range(1, epochs + 1):
             time_start = time.time()
             error_epoch = 0
             learn_update = 0.5
-            start += 500
+            start += 450
             data = [n for n in range(start, start + end)]
             shuffle(data)
             print(f"Epoch: {epoch} / {epochs}")
@@ -219,8 +228,8 @@ if __name__ == "__main__":
             print(f"Errors: {error_epoch} / {end}, Calculated time: {time_calc} sec.")
         print('End epochs!')
         print('Обучение заверешно!')
-        network.save('weight', 'weight1.csv')
-        network.save('bias', 'bias1.csv')
+        network.save('weight', 'weight2.csv')
+        network.save('bias', 'bias2.csv')
     elif situation == '0':
         print("Программа запущена")
         qApp = QApplication(sys.argv)

@@ -140,26 +140,48 @@ class Network:
         # print(self.layers[-1], f"Answer: {self.answer}, Guess: {guess_index}", sep="")
 
     def backprop(self):
-        for neuron in range(self.layers[-1].row):
-            step = int(1 if neuron == self.answer else 0)
-            delta = step - self.layers[-1].get(neuron, 0)
-            self.errors[-1].set(delta, neuron, 0)
-        # print(self.errors[-1])
-        func = self.activation.backprop
-        for weight_index in range(self.L - 2, -1, -2):
-            for row in range(self.layers[weight_index].row):
-                error = 0
-                for column in range(self.layers[weight_index].column):
-                    delta_weight = (self.layers[weight_index - 1].get(row, 0) *
-                                    func(self.layers[weight_index + 1].get(column, 0)) * self.errors[weight_index + 1].
-                                    get(column, 0) * self.lr)
-                    error += (self.errors[weight_index + 1].get(column, 0) *
-                              self.layers[weight_index].get(row, column) *
-                              func(self.layers[weight_index + 1].get(column, 0)))
-                    self.layers[weight_index].set(self.layers[weight_index].get(row, column) +
-                                                  delta_weight, row, column)
-                    if self.bias_status == 'on':
-                        delta_bias = (self.errors[weight_index + 1].get(column, 0) * func(self.layers[weight_index + 1].
-                                                                                          get(column, 0)) * self.lr)
-                        self.bias[weight_index - 1].set(self.bias[weight_index - 1].get(row, 0) + delta_bias, row, 0)
-                self.errors[weight_index - 1].set(error, row, 0)
+        # for neuron in range(self.layers[-1].row):
+        #     step = int(1 if neuron == self.answer else 0)
+        #     delta = step - self.layers[-1].get(neuron, 0)
+        #     self.errors[-1].set(delta, neuron, 0)
+        # # print(self.errors[-1])
+        # func = self.activation.backprop
+        # for weight_index in range(self.L - 2, -1, -2):
+        #     for row in range(self.layers[weight_index].row):
+        #         error = 0
+        #         for column in range(self.layers[weight_index].column):
+        #             delta_weight = (self.layers[weight_index - 1].get(row, 0) *
+        #                             func(self.layers[weight_index + 1].get(column, 0)) * self.errors[weight_index + 1].
+        #                             get(column, 0) * self.lr)
+        #             error += (self.errors[weight_index + 1].get(column, 0) *
+        #                       self.layers[weight_index].get(row, column) *
+        #                       func(self.layers[weight_index + 1].get(column, 0)))
+        #             self.layers[weight_index].set(self.layers[weight_index].get(row, column) +
+        #                                           delta_weight, row, column)
+        #             if self.bias_status == 'on':
+        #                 delta_bias = (self.errors[weight_index + 1].get(column, 0) * func(self.layers[weight_index + 1].
+        #                                                                                   get(column, 0)) * self.lr)
+        #                 self.bias[weight_index - 1].set(self.bias[weight_index - 1].get(row, 0) + delta_bias, row, 0)
+        #         self.errors[weight_index - 1].set(error, row, 0)
+
+        act = self.activation.backprop
+        for index in range(10):
+            cost = 0
+            if index == self.answer:
+                cost = 1
+            delta = cost - self.layers[-1].get(index, 0)
+            self.errors[-1].set(delta, index, 0)
+        # print(self.errors[-1].string())
+        for m in range(self.layers[3].row):
+            info = 0
+            for n in range(self.layers[3].column):
+                error = (self.layers[2].get(m, 0) * act(self.layers[4].get(n, 0)) * self.errors[4].get(n, 0)
+                         * self.lr)
+                info += self.errors[4].get(n, 0) * self.layers[3].get(m, n) * act(self.layers[4].get(n, 0))
+                self.layers[3].set(self.layers[3].get(m, n) + error, m, n)
+            self.errors[2].set(info, m, 0)
+        for m in range(self.layers[1].row):
+            for n in range(self.layers[1].column):
+                error = (self.layers[0].get(m, 0) * act(self.layers[2].get(n, 0)) * self.errors[2].get(n, 0)
+                         * self.lr)
+                self.layers[1].set(self.layers[1].get(m, n) + error, m, n)

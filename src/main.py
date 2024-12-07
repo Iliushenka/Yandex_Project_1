@@ -147,13 +147,13 @@ class MainWindow(QMainWindow):
 
 
 blur = [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 0.1, 0.2, 0.1, 0.0, 0.0, 0.0],
-        [0.0, 0.0, 0.1, 0.2, 0.4, 0.1, 0.1, 0.0, 0.0],
-        [0.0, 0.1, 0.1, 0.3, 0.4, 0.3, 0.1, 0.1, 0.0],
-        [0.0, 0.2, 0.4, 0.4, 0.7, 0.4, 0.4, 0.2, 0.0],
-        [0.0, 0.1, 0.1, 0.3, 0.4, 0.3, 0.1, 0.1, 0.0],
-        [0.0, 0.0, 0.1, 0.2, 0.4, 0.2, 0.1, 0.0, 0.0],
-        [0.0, 0.0, 0.0, 0.1, 0.2, 0.1, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.1, 0.4, 0.1, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.4, 0.6, 0.4, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.1, 0.4, 0.1, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
 
 
@@ -163,7 +163,7 @@ def result(path):
     for pos in path:
         pos_y = max(min(pos.y() // 10, 27), 0)
         pos_x = max(min(pos.x() // 10, 27), 0)
-        image[pos_y][pos_x] = 1
+        image[pos_y][pos_x] = 255
     for column in range(28):
         for row in range(28):
             delta = 0
@@ -175,7 +175,7 @@ def result(path):
                     else:
                         value = image[delta_m][delta_n] * blur[m + 4][n + 4]
                     delta += value
-            result_image[row][column] = min(delta, 253)
+            result_image[row][column] = min(delta, 255)
     for k in result_image:
         print(k)
     image = result_image
@@ -186,10 +186,10 @@ def result(path):
 
 
 if __name__ == "__main__":
-    layers_data = f"{28 * 28} 16 10"
-    network = Network(layers_data, activation="relu", learn_rate=0.035, bias_status='off')
-    network.load('weight', 'weight2.csv')
-    network.load('bias', 'bias2.csv')
+    layers_data = f"{28 * 28} 20 10"
+    network = Network(layers_data, activation="relu", learn_rate=0.0001, bias_status='on')
+    network.load('weight', 'weight4.csv')
+    network.load('bias', 'bias4.csv')
 
 
     print("Добро пожаловать! ИИ инициализирован")
@@ -205,13 +205,13 @@ if __name__ == "__main__":
             (x_train, y_train), (x_test, y_test) = data_ai
         print("База данных загружена!")
 
-        epochs = 20
+        epochs = 5
         start, end = (3000, 1000)
         for epoch in range(1, epochs + 1):
             time_start = time.time()
             error_epoch = 0
-            learn_update = 0.5
-            start += 450
+            learn_update = 0.4
+            start += 0
             data = [n for n in range(start, start + end)]
             shuffle(data)
             print(f"Epoch: {epoch} / {epochs}")
@@ -228,8 +228,8 @@ if __name__ == "__main__":
             print(f"Errors: {error_epoch} / {end}, Calculated time: {time_calc} sec.")
         print('End epochs!')
         print('Обучение заверешно!')
-        network.save('weight', 'weight2.csv')
-        network.save('bias', 'bias2.csv')
+        network.save('weight', 'weight4.csv')
+        network.save('bias', 'bias4.csv')
     elif situation == '0':
         print("Программа запущена")
         qApp = QApplication(sys.argv)
@@ -238,4 +238,3 @@ if __name__ == "__main__":
         sys.exit(qApp.exec())
     else:
         print("Надо написать 1 или 0")
-        sys.exit('Wrong argument')

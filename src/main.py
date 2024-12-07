@@ -185,7 +185,7 @@ def result(path):
 
 if __name__ == "__main__":
     layers_data = f"{28 * 28} 20 10"
-    network = Network(layers_data, activation="relu", learn_rate=0.0001, bias_status='on')
+    network = Network(layers_data, activation="relu", learn_rate=0.000005, bias_status='on')
     network.load('weight', 'weight4.csv')
     network.load('bias', 'bias4.csv')
 
@@ -204,7 +204,7 @@ if __name__ == "__main__":
         print("База данных загружена!")
 
         epochs = 5
-        start, end = (3000, 1000)
+        start, end = (6000, 1000)
         for epoch in range(1, epochs + 1):
             time_start = time.time()
             error_epoch = 0

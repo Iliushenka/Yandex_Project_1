@@ -176,8 +176,6 @@ def result(path):
                         value = image[delta_m][delta_n] * blur[m + 4][n + 4]
                     delta += value
             result_image[row][column] = min(delta, 255)
-    for k in result_image:
-        print(k)
     image = result_image
     network.set_image(image, 0)
     network.forward()
